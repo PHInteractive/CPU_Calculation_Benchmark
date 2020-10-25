@@ -109,11 +109,13 @@ int main() {
 	std::cout << "Prime Numbers found in Thread 2: " << Thread2IntTest8.get() << std::endl;
 	std::cout << "Prime Numbers found in Thread 3: " << Thread3IntTest8.get() << std::endl;
 	std::cout << "Prime Numbers found in Thread 4: " << Thread4IntTest8.get() << std::endl;
-	std::cout << "Prime Numbers found in Thread 4: " << Thread5IntTest8.get() << std::endl;
-	std::cout << "Prime Numbers found in Thread 4: " << Thread6IntTest8.get() << std::endl;
-	std::cout << "Prime Numbers found in Thread 4: " << Thread7IntTest8.get() << std::endl;
-	std::cout << "Prime Numbers found in Thread 4: " << Thread8IntTest8.get() << std::endl;
+	std::cout << "Prime Numbers found in Thread 5: " << Thread5IntTest8.get() << std::endl;
+	std::cout << "Prime Numbers found in Thread 6: " << Thread6IntTest8.get() << std::endl;
+	std::cout << "Prime Numbers found in Thread 7: " << Thread7IntTest8.get() << std::endl;
+	std::cout << "Prime Numbers found in Thread 8: " << Thread8IntTest8.get() << std::endl;
 	std::cout << "__________________________________________________________________" << std::endl << std::endl;
+
+
 
 	return 0;
 }
