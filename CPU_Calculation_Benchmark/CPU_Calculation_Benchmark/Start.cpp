@@ -3286,7 +3286,7 @@ int main() {
 		std::cout << "___________________________________________________________________" << std::endl << std::endl;
 	}
 
-	//usless Test (150, 200, 300 Threads)
+	//usless Test (150, 200, 250 Threads)
 	if (false) {
 		//150 Thread Test
 		ThreadExit = false;
