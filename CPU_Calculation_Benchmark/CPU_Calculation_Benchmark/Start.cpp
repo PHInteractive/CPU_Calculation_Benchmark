@@ -24,7 +24,7 @@ int main() {
 		SystemThreads = std::thread::hardware_concurrency();
 	}
 
-	std::thread *testThreads = new std::thread[SystemThreads*2] ;
+	std::thread *testThreads = new std::thread[SystemThreads] ;
 	for (int i = 0; i <= SystemThreads - 1; i++) {
 		testThreads[i] = std::thread(testfunc);
 	}
