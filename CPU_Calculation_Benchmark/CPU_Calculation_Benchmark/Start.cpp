@@ -10,7 +10,7 @@ int secondsWait = 10;
 void calculatePrimeNumber(std::promise<int>&& primeNumbers, std::promise<int>&& calculations);
 void RunBenchmark(int NumberofThreads);
 
-int WinMain() {
+int main() {
 	if (std::thread::hardware_concurrency() == 0) {
 		std::cout << "cannot detect number of threads of this System" << std::endl;
 		std::cout << "Using 8 Threads for testing" << std::endl;
