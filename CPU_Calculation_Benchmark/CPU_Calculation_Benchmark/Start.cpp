@@ -4,14 +4,11 @@
 #include <future>
 
 int SystemThreads;
-bool RunBenchmark = false;
+bool BenchmarkRun = false;
 bool ThreadExit = false;
 int secondsWait = 10;
 void calculatePrimeNumber(std::promise<int>&& primeNumbers, std::promise<int>&& calculations);
-
-void testfunc() {
-	std::cout << std::this_thread::get_id() << std::endl;
-}
+void RunBenchmark(int NumberofThreads);
 
 int main() {
 	if (std::thread::hardware_concurrency() == 0) {
@@ -20,43 +17,25 @@ int main() {
 		SystemThreads = 8;
 	}
 	else {
-		std::cout << "detectet " << std::thread::hardware_concurrency() << " System Threads for benchmarking" << std::endl;
+		std::cout << "detectet " << std::thread::hardware_concurrency() << " System Threads for benchmarking" << std::endl << std::endl << std::endl;
 		SystemThreads = std::thread::hardware_concurrency();
 	}
-
-	std::promise<int>* Threads = new std::promise<int>[SystemThreads];
-	std::promise<int>* Threads2 = new std::promise<int>[SystemThreads];
-	std::future<int> *calculations = new std::future<int> [SystemThreads];
-	std::future<int> *primes = new std::future<int> [SystemThreads];
-	for (int i = 0; i <= SystemThreads - 1; i++) {
-		calculations[i] = Threads[i].get_future();
-		primes[i] = Threads2[i].get_future();
+	RunBenchmark(1);
+	if (SystemThreads >= 2) {
+		if (SystemThreads == 2) {
+			RunBenchmark(2);
+		}
+		else if (SystemThreads > 2) {
+			RunBenchmark(2);
+			RunBenchmark(SystemThreads);
+		}
 	}
-
-	std::thread *testThreads = new std::thread[SystemThreads] ;
-	for (int i = 0; i <= SystemThreads - 1; i++) {
-		testThreads[i] = std::thread(&calculatePrimeNumber, std::move(Threads2[i]), std::move(Threads[i]));
-	}
-	std::this_thread::sleep_for(std::chrono::seconds(3));
-	RunBenchmark = true;
-	std::this_thread::sleep_for(std::chrono::seconds(secondsWait));
-	ThreadExit = true;
-	testThreads[SystemThreads - 1].join();
-	int totalCalcs = 0;
-	int totalPrimes = 0;
-	for (int i = 0; i <= SystemThreads - 1; i++) {
-		totalCalcs = totalCalcs + calculations[i].get();
-		totalPrimes = totalPrimes + primes[i].get();
-	}
-	std::cout << "Totoal Number of calculations on all Threads: " << totalCalcs << std::endl;
-	std::cout << "Approximatley calculations per Thread:  " << totalCalcs / SystemThreads << std::endl;
-	std::cout << "Totoal Number of Prime Numbers found on all Threads: " << totalPrimes << std::endl;
-	std::cout << "Approximatley Number of Prime Numbers found per Thread: " << totalPrimes / SystemThreads << std::endl;
+	std::cout << "All Benchmarks are done" << std::endl;
 	return 0;
 }
 
 void calculatePrimeNumber(std::promise<int>&& primeNumbers, std::promise<int>&& calculations) {
-	do {} while (RunBenchmark == false);
+	do {} while (BenchmarkRun == false);
 	int currentcalculations = 0;
 	int foundPrimeNumbers = 0;
 	int count = 0;
@@ -78,4 +57,45 @@ void calculatePrimeNumber(std::promise<int>&& primeNumbers, std::promise<int>&& 
 	} while (ThreadExit == false);
 	primeNumbers.set_value(foundPrimeNumbers);
 	calculations.set_value(currentcalculations);
+}
+
+void RunBenchmark(int NumberofThreads) {
+	std::promise<int>* PromisCalculations = new std::promise<int>[NumberofThreads];
+	std::promise<int>* PromisePrimeNumbers = new std::promise<int>[NumberofThreads];
+	std::future<int>* calculations = new std::future<int>[NumberofThreads];
+	std::future<int>* CalculatetPrimeNumbers = new std::future<int>[NumberofThreads];
+	for (int i = 0; i <= NumberofThreads - 1; i++) {
+		calculations[i] = PromisCalculations[i].get_future();
+		CalculatetPrimeNumbers[i] = PromisePrimeNumbers[i].get_future();
+	}
+
+	std::thread* testThreads = new std::thread[NumberofThreads];
+	for (int i = 0; i <= NumberofThreads - 1; i++) {
+		testThreads[i] = std::thread(&calculatePrimeNumber, std::move(PromisePrimeNumbers[i]), std::move(PromisCalculations[i]));
+	}
+	std::this_thread::sleep_for(std::chrono::seconds(3));
+	BenchmarkRun = true;
+	std::this_thread::sleep_for(std::chrono::seconds(secondsWait));
+	ThreadExit = true;
+	testThreads[NumberofThreads - 1].join();
+	int totalCalculations = 0;
+	int totalPrimeNumbersFound = 0;
+	for (int i = 0; i <= NumberofThreads - 1; i++) {
+		totalCalculations = totalCalculations + calculations[i].get();
+		totalPrimeNumbersFound = totalPrimeNumbersFound + CalculatetPrimeNumbers[i].get();
+	}
+	std::cout << "_______________________________________________________________________________________________________________________" << std::endl;
+	std::cout << NumberofThreads << " Thread Benchmark completet" << std::endl;
+	std::cout << "Totoal Number of calculations on all Threads: " << totalCalculations << std::endl;
+	if (NumberofThreads != 1) {
+		std::cout << "Approximatley calculations per Thread:  " << totalCalculations / NumberofThreads << std::endl;
+	}
+	std::cout << "Totoal Number of Prime Numbers found on all Threads: " << totalPrimeNumbersFound << std::endl;
+	if (NumberofThreads != 1) {
+		std::cout << "Approximatley Prime Numbers found per Thread: " << totalPrimeNumbersFound / NumberofThreads << std::endl;
+
+	}
+	std::cout << "_______________________________________________________________________________________________________________________" << std::endl << std::endl;
+	BenchmarkRun = false;
+	ThreadExit = false;
 }
