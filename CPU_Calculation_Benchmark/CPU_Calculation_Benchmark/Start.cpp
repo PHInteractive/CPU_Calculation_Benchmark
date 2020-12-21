@@ -2,33 +2,72 @@
 #include <thread>
 #include <chrono>
 #include <future>
+#include <string>
 
-int SystemThreads;
+int SystemThreads = 0;
 bool BenchmarkRun = false;
 bool ThreadExit = false;
 int secondsWait = 10;
 void calculatePrimeNumber(std::promise<int>&& primeNumbers, std::promise<int>&& calculations);
 void RunBenchmark(int NumberofThreads);
 
-int main() {
-	if (std::thread::hardware_concurrency() == 0) {
-		std::cout << "cannot detect number of threads of this System" << std::endl;
-		std::cout << "Using 8 Threads for testing" << std::endl;
-		SystemThreads = 8;
+int main(int argc, char *argv[]) {
+
+	std::cout << "Arguments passed to executable: " << argc << std::endl;
+	if (argc > 1) {
+		for (int currentArgument = 1; currentArgument <= argc - 1; currentArgument++) {
+			if (strcmp(argv[currentArgument], "-t") == 0 or strcmp(argv[currentArgument], "-threads") == 0) {
+				std::string SpecifiedNumberOfThreads = "0";
+				if (SystemThreads == 0) {
+					if (currentArgument + 1 <= argc) {
+						SpecifiedNumberOfThreads = argv[currentArgument + 1];
+					}
+					else {
+						std::cout << "No Argument specified!" << std::endl;
+					}
+					if (SpecifiedNumberOfThreads.find_first_not_of("0123456789") != std::string::npos) {
+						std::cout << "NO INT!" << std::endl;
+					}
+					else {
+						std::cout << "Using " << argv[currentArgument + 1] << " Threads" << std::endl;
+						if (std::stoi(SpecifiedNumberOfThreads) <= 0) {
+							std::cout << "Minimum number of Threads is 1!" << std::endl;
+						}
+						else {
+							SystemThreads = std::stoi(SpecifiedNumberOfThreads);
+						}
+					}
+				}
+				else {
+					std::cout << "Already set Threads for Benchmarking!" << std::endl;
+				}
+			}
+		}
+	}
+	
+	if (SystemThreads == 0) {
+		if (std::thread::hardware_concurrency() == 0) {
+			std::cout << "cannot detect number of threads of this System" << std::endl;
+			std::cout << "Using 8 Threads for testing" << std::endl;
+			SystemThreads = 8;
+		}
+		else {
+			std::cout << "detectet " << std::thread::hardware_concurrency() << " System Threads for benchmarking" << std::endl << std::endl << std::endl;
+			SystemThreads = std::thread::hardware_concurrency();
+		}
+		RunBenchmark(1);
+		if (SystemThreads >= 2) {
+			if (SystemThreads == 2) {
+				RunBenchmark(2);
+			}
+			else if (SystemThreads > 2) {
+				RunBenchmark(2);
+				RunBenchmark(SystemThreads);
+			}
+		}
 	}
 	else {
-		std::cout << "detectet " << std::thread::hardware_concurrency() << " System Threads for benchmarking" << std::endl << std::endl << std::endl;
-		SystemThreads = std::thread::hardware_concurrency();
-	}
-	RunBenchmark(1);
-	if (SystemThreads >= 2) {
-		if (SystemThreads == 2) {
-			RunBenchmark(2);
-		}
-		else if (SystemThreads > 2) {
-			RunBenchmark(2);
-			RunBenchmark(SystemThreads);
-		}
+		RunBenchmark(SystemThreads);
 	}
 	std::cout << "All Benchmarks are done" << std::endl;
 	return 0;
