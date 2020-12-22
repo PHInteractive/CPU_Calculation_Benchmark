@@ -7,44 +7,86 @@
 int SystemThreads = 0;
 bool BenchmarkRun = false;
 bool ThreadExit = false;
-int secondsWait = 10;
+int secondsWait = 0;
 void calculatePrimeNumber(std::promise<int>&& primeNumbers, std::promise<int>&& calculations);
 void RunBenchmark(int NumberofThreads);
 
 int main(int argc, char *argv[]) {
-
 	std::cout << "Arguments passed to executable: " << argc << std::endl;
 	if (argc > 1) {
-		for (int currentArgument = 1; currentArgument <= argc - 1; currentArgument++) {
+		for (int currentArgument = 1; currentArgument <= argc - 1; currentArgument++) {	//loop though all arguments (expect argument 0) passed to the application
 			if (strcmp(argv[currentArgument], "-t") == 0 or strcmp(argv[currentArgument], "-threads") == 0) {
 				std::string SpecifiedNumberOfThreads = "0";
 				if (SystemThreads == 0) {
-					if (currentArgument + 1 <= argc) {
+					if (currentArgument + 1 <= argc - 1) {
 						SpecifiedNumberOfThreads = argv[currentArgument + 1];
 					}
 					else {
-						std::cout << "No Argument specified!" << std::endl;
+						std::cout << "No Value for the Argument specified!" << std::endl;
+						std::exit(1);
 					}
 					if (SpecifiedNumberOfThreads.find_first_not_of("0123456789") != std::string::npos) {
-						std::cout << "NO INT!" << std::endl;
+						std::cout << "Value is not a number" << std::endl;
+						std::exit(1);
 					}
 					else {
 						std::cout << "Using " << argv[currentArgument + 1] << " Threads" << std::endl;
 						if (std::stoi(SpecifiedNumberOfThreads) <= 0) {
 							std::cout << "Minimum number of Threads is 1!" << std::endl;
+							std::exit(1);
 						}
 						else {
 							SystemThreads = std::stoi(SpecifiedNumberOfThreads);
+							currentArgument++;
 						}
 					}
 				}
 				else {
 					std::cout << "Already set Threads for Benchmarking!" << std::endl;
+					std::exit(1);
 				}
+			} 
+			else if (strcmp(argv[currentArgument], "-d") == 0 or strcmp(argv[currentArgument], "-duration") == 0) {
+				std::string SpecifiedNumberOfSeconds = "0";
+				if (secondsWait == 0) {
+					if (currentArgument + 1 <= argc - 1) {
+						SpecifiedNumberOfSeconds = argv[currentArgument + 1];
+					}
+					else {
+						std::cout << "No Value for the Argument specified!" << std::endl;
+						std::exit(1);
+					}
+					if (SpecifiedNumberOfSeconds.find_first_not_of("0123456789") != std::string::npos) {
+						std::cout << "Value is not a number" << std::endl;
+						std::exit(1);
+					}
+					else {
+						std::cout << "Running " << argv[currentArgument + 1] << " seconds per Test" << std::endl;
+						if (std::stoi(SpecifiedNumberOfSeconds) <= 0) {
+							std::cout << "Minimum number of duration in seconds is 1!" << std::endl;
+							std::exit(1);
+						}
+						else {
+							secondsWait = std::stoi(SpecifiedNumberOfSeconds);
+							currentArgument++;
+						}
+					}
+				}
+				else {
+					std::cout << "Already set Duration for Benchmarking!" << std::endl;
+					std::exit(1);
+				}
+			}
+			else {
+				std::cout << "ERROR !" << std::endl;
+				std::cout << "Argument " << currentArgument << " (\"" << argv[currentArgument] << "\") is invalid." << std::endl;
+				std::exit(1);
 			}
 		}
 	}
-	
+	if (secondsWait == 0) {
+		secondsWait = 10;
+	}
 	if (SystemThreads == 0) {
 		if (std::thread::hardware_concurrency() == 0) {
 			std::cout << "cannot detect number of threads of this System" << std::endl;
@@ -112,7 +154,7 @@ void RunBenchmark(int NumberofThreads) {
 	for (int i = 0; i <= NumberofThreads - 1; i++) {
 		testThreads[i] = std::thread(&calculatePrimeNumber, std::move(PromisePrimeNumbers[i]), std::move(PromisCalculations[i]));
 	}
-	std::this_thread::sleep_for(std::chrono::seconds(3));
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 	BenchmarkRun = true;
 	std::this_thread::sleep_for(std::chrono::seconds(secondsWait));
 	ThreadExit = true;
