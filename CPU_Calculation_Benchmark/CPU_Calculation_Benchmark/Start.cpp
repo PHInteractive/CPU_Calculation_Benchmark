@@ -84,9 +84,11 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
+	//setup secondsWait (the time the Benchmark is activly running) for Benchmarking when none is specified through launch parameters
 	if (secondsWait == 0) {
 		secondsWait = 10;
 	}
+	//setup systemThreads for Benchmarking when none are specified through launch parameters
 	if (SystemThreads == 0) {
 		if (std::thread::hardware_concurrency() == 0) {
 			std::cout << "cannot detect number of threads of this System" << std::endl;
@@ -116,7 +118,7 @@ int main(int argc, char *argv[]) {
 }
 
 void calculatePrimeNumber(std::promise<int>&& primeNumbers, std::promise<int>&& calculations) {
-	do {} while (BenchmarkRun == false);
+	do {} while (BenchmarkRun == false);	//used to stop function from continuing before all threads are created
 	int currentcalculations = 0;
 	int foundPrimeNumbers = 0;
 	int count = 0;
@@ -145,19 +147,23 @@ void RunBenchmark(int NumberofThreads) {
 	std::promise<int>* PromisePrimeNumbers = new std::promise<int>[NumberofThreads];
 	std::future<int>* calculations = new std::future<int>[NumberofThreads];
 	std::future<int>* CalculatetPrimeNumbers = new std::future<int>[NumberofThreads];
+	//dynamicly create variables to store results in
 	for (int i = 0; i <= NumberofThreads - 1; i++) {
 		calculations[i] = PromisCalculations[i].get_future();
 		CalculatetPrimeNumbers[i] = PromisePrimeNumbers[i].get_future();
 	}
-
+	//dynamicly create and spawn threads
 	std::thread* testThreads = new std::thread[NumberofThreads];
 	for (int i = 0; i <= NumberofThreads - 1; i++) {
 		testThreads[i] = std::thread(&calculatePrimeNumber, std::move(PromisePrimeNumbers[i]), std::move(PromisCalculations[i]));
 	}
+	//wait a short time to make sure, all threads are created and running
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	BenchmarkRun = true;
 	std::this_thread::sleep_for(std::chrono::seconds(secondsWait));
+	//Exit function in the created threads
 	ThreadExit = true;
+	//Wait until all threads are finfished
 	testThreads[NumberofThreads - 1].join();
 	int totalCalculations = 0;
 	int totalPrimeNumbersFound = 0;
@@ -177,6 +183,7 @@ void RunBenchmark(int NumberofThreads) {
 
 	}
 	std::cout << "_______________________________________________________________________________________________________________________" << std::endl << std::endl;
+	//Prepare Variables for potential nex Benchmark run
 	BenchmarkRun = false;
 	ThreadExit = false;
 }
