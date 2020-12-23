@@ -4,17 +4,20 @@
 #include <future>
 #include <string>
 
-const char* localVersion = "0.0.0.0";
+//variable declaration
+const char* localVersion = "0.0.0.1";
 int SystemThreads = 0;
+int secondsWait = 0;
 bool BenchmarkRun = false;
 bool ThreadExit = false;
-int secondsWait = 0;
+//function declaration
 void calculatePrimeNumber(std::promise<int>&& primeNumbers, std::promise<int>&& calculations);
 void RunBenchmark(int NumberofThreads);
 
 int main(int argc, char *argv[]) {
 	if (argc > 1) {
-		for (int currentArgument = 1; currentArgument <= argc - 1; currentArgument++) {	//loop though all arguments (expect argument 0) passed to the application
+		//loop though all arguments (expect argument 0) passed to the application
+		for (int currentArgument = 1; currentArgument <= argc - 1; currentArgument++) {
 			if (strcmp(argv[currentArgument], "-v") == 0 or strcmp(argv[currentArgument], "-version") == 0) {
 				std::cout << "CPU Calculation Benchmark" << std::endl;
 				std::cout << "Version: " << localVersion << std::endl;
@@ -204,7 +207,7 @@ void RunBenchmark(int NumberofThreads) {
 
 	}
 	std::cout << "_______________________________________________________________________________________________________________________" << std::endl << std::endl;
-	//Prepare Variables for potential nex Benchmark run
+	//Prepare Variables for potential next Benchmark run
 	BenchmarkRun = false;
 	ThreadExit = false;
 }
