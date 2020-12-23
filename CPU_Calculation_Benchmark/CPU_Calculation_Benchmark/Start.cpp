@@ -12,7 +12,6 @@ void calculatePrimeNumber(std::promise<int>&& primeNumbers, std::promise<int>&& 
 void RunBenchmark(int NumberofThreads);
 
 int main(int argc, char *argv[]) {
-	std::cout << "Arguments passed to executable: " << argc << std::endl;
 	if (argc > 1) {
 		for (int currentArgument = 1; currentArgument <= argc - 1; currentArgument++) {	//loop though all arguments (expect argument 0) passed to the application
 			if (strcmp(argv[currentArgument], "-t") == 0 or strcmp(argv[currentArgument], "-threads") == 0) {
@@ -46,6 +45,22 @@ int main(int argc, char *argv[]) {
 					std::exit(1);
 				}
 			} 
+			else if (strcmp(argv[currentArgument], "-a") == 0 or strcmp(argv[currentArgument], "-UseAllThreads") == 0) {
+				std::string SpecifiedNumberOfThreads = "0";
+				if (SystemThreads == 0) {
+					if (std::thread::hardware_concurrency() == 0) {
+						std::cout << "Funtion to detect logical Cores failed, please set Thread-Count with -t or -threads" << std::endl;
+						std::exit(1);
+					}
+					else {
+						SystemThreads = std::thread::hardware_concurrency();
+					}
+				}
+				else {
+					std::cout << "Already set Threads for Benchmarking!" << std::endl;
+					std::exit(1);
+				}
+			}
 			else if (strcmp(argv[currentArgument], "-d") == 0 or strcmp(argv[currentArgument], "-duration") == 0) {
 				std::string SpecifiedNumberOfSeconds = "0";
 				if (secondsWait == 0) {
@@ -110,10 +125,10 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
+	//run Benchmark with specified Thread-Count when launched with -t/-threads
 	else {
 		RunBenchmark(SystemThreads);
 	}
-	std::cout << "All Benchmarks are done" << std::endl;
 	return 0;
 }
 
