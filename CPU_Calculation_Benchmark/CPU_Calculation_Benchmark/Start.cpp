@@ -4,6 +4,7 @@
 #include <future>
 #include <string>
 
+const char* localVersion = "0.0.0.0";
 int SystemThreads = 0;
 bool BenchmarkRun = false;
 bool ThreadExit = false;
@@ -14,7 +15,12 @@ void RunBenchmark(int NumberofThreads);
 int main(int argc, char *argv[]) {
 	if (argc > 1) {
 		for (int currentArgument = 1; currentArgument <= argc - 1; currentArgument++) {	//loop though all arguments (expect argument 0) passed to the application
-			if (strcmp(argv[currentArgument], "-t") == 0 or strcmp(argv[currentArgument], "-threads") == 0) {
+			if (strcmp(argv[currentArgument], "-v") == 0 or strcmp(argv[currentArgument], "-version") == 0) {
+				std::cout << "CPU Calculation Benchmark" << std::endl;
+				std::cout << "Version: " << localVersion << std::endl;
+				std::exit(2);
+			}
+			else if (strcmp(argv[currentArgument], "-t") == 0 or strcmp(argv[currentArgument], "-threads") == 0) {
 				std::string SpecifiedNumberOfThreads = "0";
 				if (SystemThreads == 0) {
 					if (currentArgument + 1 <= argc - 1) {
