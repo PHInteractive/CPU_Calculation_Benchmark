@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 			if (strcmp(argv[currentArgument], "-v") == 0 or strcmp(argv[currentArgument], "-version") == 0) {
 				std::cout << "CPU Calculation Benchmark" << std::endl;
 				std::cout << "Version: " << localVersion << std::endl;
-				std::exit(2);
+				return 0;
 			}
 			else if (strcmp(argv[currentArgument], "-h") == 0 or strcmp(argv[currentArgument], "-help") == 0) {
 				std::cout << "CPU Calculation Benchmark Help" << std::endl;
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 				std::cout << "-t  -threads [number]		this sets the number of threads used in the Benchamrk." << std::endl;
 				std::cout << "-a  -UseAllThreads		this uses all threads that are usable for the Benchmark." << std::endl;
 				std::cout << "-d  -duration [number]		this sets the time in seconds the Benchmark(s) is/are running." << std::endl;
-				std::exit(2);
+				return 0;
 			}
 			else if (strcmp(argv[currentArgument], "-t") == 0 or strcmp(argv[currentArgument], "-threads") == 0) {
 				std::string SpecifiedNumberOfThreads = "0";
@@ -40,17 +40,17 @@ int main(int argc, char *argv[]) {
 					}
 					else {
 						std::cout << "No Value for the Argument specified!" << std::endl;
-						std::exit(1);
+						return 1;
 					}
 					if (SpecifiedNumberOfThreads.find_first_not_of("0123456789") != std::string::npos) {
 						std::cout << "Value is not a number" << std::endl;
-						std::exit(1);
+						return 1;
 					}
 					else {
 						std::cout << "Using " << argv[currentArgument + 1] << " Threads" << std::endl;
 						if (std::stoi(SpecifiedNumberOfThreads) <= 0) {
 							std::cout << "Minimum number of Threads is 1!" << std::endl;
-							std::exit(1);
+							return 1;
 						}
 						else {
 							SystemThreads = std::stoi(SpecifiedNumberOfThreads);
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
 				}
 				else {
 					std::cout << "Already set Threads for Benchmarking!" << std::endl;
-					std::exit(1);
+					return 1;
 				}
 			} 
 			else if (strcmp(argv[currentArgument], "-a") == 0 or strcmp(argv[currentArgument], "-UseAllThreads") == 0) {
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 				if (SystemThreads == 0) {
 					if (std::thread::hardware_concurrency() == 0) {
 						std::cout << "Funtion to detect logical Cores failed, please set Thread-Count with -t or -threads" << std::endl;
-						std::exit(1);
+						return 1;
 					}
 					else {
 						SystemThreads = std::thread::hardware_concurrency();
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
 				}
 				else {
 					std::cout << "Already set Threads for Benchmarking!" << std::endl;
-					std::exit(1);
+					return 1;
 				}
 			}
 			else if (strcmp(argv[currentArgument], "-d") == 0 or strcmp(argv[currentArgument], "-duration") == 0) {
@@ -87,17 +87,17 @@ int main(int argc, char *argv[]) {
 					}
 					else {
 						std::cout << "No Value for the Argument specified!" << std::endl;
-						std::exit(1);
+						return 1;
 					}
 					if (SpecifiedNumberOfSeconds.find_first_not_of("0123456789") != std::string::npos) {
 						std::cout << "Value is not a number" << std::endl;
-						std::exit(1);
+						return 1;
 					}
 					else {
 						std::cout << "Running " << argv[currentArgument + 1] << " seconds per Test" << std::endl;
 						if (std::stoi(SpecifiedNumberOfSeconds) <= 0) {
 							std::cout << "Minimum number of duration in seconds is 1!" << std::endl;
-							std::exit(1);
+							return 1;
 						}
 						else {
 							secondsWait = std::stoi(SpecifiedNumberOfSeconds);
@@ -107,13 +107,13 @@ int main(int argc, char *argv[]) {
 				}
 				else {
 					std::cout << "Already set Duration for Benchmarking!" << std::endl;
-					std::exit(1);
+					return 1;
 				}
 			}
 			else {
 				std::cout << "ERROR !" << std::endl;
 				std::cout << "Argument " << currentArgument << " (\"" << argv[currentArgument] << "\") is invalid." << std::endl;
-				std::exit(1);
+				return 1;
 			}
 		}
 	}
