@@ -23,6 +23,15 @@ int main(int argc, char *argv[]) {
 				std::cout << "Version: " << localVersion << std::endl;
 				std::exit(2);
 			}
+			else if (strcmp(argv[currentArgument], "-h") == 0 or strcmp(argv[currentArgument], "-help") == 0) {
+				std::cout << "CPU Calculation Benchmark Help" << std::endl;
+				std::cout << "-h  -help			shows this Help Page" << std::endl;
+				std::cout << "-v  -version			displays the current Version of the Program" << std::endl;
+				std::cout << "-t  -threads [number]		this sets the number of threads used in the Benchamrk." << std::endl;
+				std::cout << "-a  -UseAllThreads		this uses all threads that are usable for the Benchmark." << std::endl;
+				std::cout << "-d  -duration [number]		this sets the time in seconds the Benchmark(s) is/are running." << std::endl;
+				std::exit(2);
+			}
 			else if (strcmp(argv[currentArgument], "-t") == 0 or strcmp(argv[currentArgument], "-threads") == 0) {
 				std::string SpecifiedNumberOfThreads = "0";
 				if (SystemThreads == 0) {
