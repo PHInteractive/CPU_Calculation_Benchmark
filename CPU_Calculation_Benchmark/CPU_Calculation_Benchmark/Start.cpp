@@ -6,7 +6,7 @@
 
 //variable declaration
 const char* localVersion = "0.0.1";
-int SystemThreads = 0;
+int BenchmarkThreads = 0;
 int secondsWait = 0;
 bool BenchmarkRun = false;
 bool ThreadExit = false;
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 			}
 			else if (strcmp(argv[currentArgument], "-t") == 0 or strcmp(argv[currentArgument], "-threads") == 0) {
 				std::string SpecifiedNumberOfThreads = "0";
-				if (SystemThreads == 0) {
+				if (BenchmarkThreads == 0) {
 					if (currentArgument + 1 <= argc - 1) {
 						SpecifiedNumberOfThreads = argv[currentArgument + 1];
 					}
@@ -47,13 +47,12 @@ int main(int argc, char *argv[]) {
 						return 1;
 					}
 					else {
-						std::cout << "Using " << argv[currentArgument + 1] << " Threads" << std::endl;
 						if (std::stoi(SpecifiedNumberOfThreads) <= 0) {
 							std::cout << "Minimum number of Threads is 1!" << std::endl;
 							return 1;
 						}
 						else {
-							SystemThreads = std::stoi(SpecifiedNumberOfThreads);
+							BenchmarkThreads = std::stoi(SpecifiedNumberOfThreads);
 							currentArgument++;
 						}
 					}
@@ -65,13 +64,13 @@ int main(int argc, char *argv[]) {
 			} 
 			else if (strcmp(argv[currentArgument], "-a") == 0 or strcmp(argv[currentArgument], "-UseAllThreads") == 0) {
 				std::string SpecifiedNumberOfThreads = "0";
-				if (SystemThreads == 0) {
+				if (BenchmarkThreads == 0) {
 					if (std::thread::hardware_concurrency() == 0) {
 						std::cout << "Funtion to detect logical Cores failed, please set Thread-Count with -t or -threads" << std::endl;
 						return 1;
 					}
 					else {
-						SystemThreads = std::thread::hardware_concurrency();
+						BenchmarkThreads = std::thread::hardware_concurrency();
 					}
 				}
 				else {
@@ -94,7 +93,6 @@ int main(int argc, char *argv[]) {
 						return 1;
 					}
 					else {
-						std::cout << "Running " << argv[currentArgument + 1] << " seconds per Test" << std::endl;
 						if (std::stoi(SpecifiedNumberOfSeconds) <= 0) {
 							std::cout << "Minimum number of duration in seconds is 1!" << std::endl;
 							return 1;
@@ -122,30 +120,34 @@ int main(int argc, char *argv[]) {
 		secondsWait = 10;
 	}
 	//setup systemThreads for Benchmarking when none are specified through launch parameters
-	if (SystemThreads == 0) {
+	if (BenchmarkThreads == 0) {
 		if (std::thread::hardware_concurrency() == 0) {
 			std::cout << "cannot detect number of threads of this System" << std::endl;
 			std::cout << "Using 8 Threads for testing" << std::endl;
-			SystemThreads = 8;
+			std::cout << "Every Test will go for " << secondsWait << " seconds" << std::endl << std::endl << std::endl;
+			BenchmarkThreads = 8;
 		}
 		else {
-			std::cout << "detectet " << std::thread::hardware_concurrency() << " System Threads for benchmarking" << std::endl << std::endl << std::endl;
-			SystemThreads = std::thread::hardware_concurrency();
+			std::cout << "detectet " << std::thread::hardware_concurrency() << " System Threads for benchmarking" << std::endl;
+			std::cout << "Every Test will go for " << secondsWait << " seconds" << std::endl << std::endl << std::endl;
+			BenchmarkThreads = std::thread::hardware_concurrency();
 		}
 		RunBenchmark(1);
-		if (SystemThreads >= 2) {
-			if (SystemThreads == 2) {
+		if (BenchmarkThreads >= 2) {
+			if (BenchmarkThreads == 2) {
 				RunBenchmark(2);
 			}
-			else if (SystemThreads > 2) {
+			else if (BenchmarkThreads > 2) {
 				RunBenchmark(2);
-				RunBenchmark(SystemThreads);
+				RunBenchmark(BenchmarkThreads);
 			}
 		}
 	}
 	//run Benchmark with specified Thread-Count when launched with -t/-threads
 	else {
-		RunBenchmark(SystemThreads);
+		std::cout << "Using " << BenchmarkThreads << " Threads for testing" << std::endl;
+		std::cout << "The Test will go for " << secondsWait << " seconds" << std::endl << std::endl << std::endl;
+		RunBenchmark(BenchmarkThreads);
 	}
 	return 0;
 }
