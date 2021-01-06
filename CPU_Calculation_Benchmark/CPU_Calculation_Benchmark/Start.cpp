@@ -5,7 +5,7 @@
 #include <string>
 
 //variable declaration
-const char* localVersion = "0.0.0.1";
+const char* localVersion = "0.0.1";
 int SystemThreads = 0;
 int secondsWait = 0;
 bool BenchmarkRun = false;
